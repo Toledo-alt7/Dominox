@@ -2,8 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 
-package br.maua.dominox;
-
+package br.maua.dominox; 
 /**
  *
  * @author felipe
