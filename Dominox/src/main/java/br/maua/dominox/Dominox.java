@@ -10,6 +10,11 @@ package br.maua.dominox;
 public class Dominox {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        		
+		IDandPasswords idandPasswords = new IDandPasswords();
+				
+		LoginPage loginPage = new LoginPage(idandPasswords.getLoginInfo());
+
+
     }
 }
