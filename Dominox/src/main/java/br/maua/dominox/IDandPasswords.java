@@ -9,10 +9,23 @@ public class IDandPasswords {
     IDandPasswords(){
         
         logininfo.put("felipe", "1");
-        
+        logininfo.put("pedro", "123");
    }
    
    protected HashMap getLoginInfo(){
         return logininfo;
    }
+   protected int ID;
+    
+    public void getID(String userID){
+        
+        if(userID == "felipe"){
+            ID += 1;
+            this.ID = ID;
+            
+        }
+        else{
+            this.ID = ID;
+        }
+    }
 }

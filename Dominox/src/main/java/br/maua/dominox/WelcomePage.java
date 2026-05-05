@@ -11,7 +11,7 @@ public class WelcomePage{
 	JFrame frame = new JFrame();
 	JLabel welcomeLabel = new JLabel("Hello!");
     JButton jogar = new JButton("Botão");
-    JButton modoEditor = new JButton("Editar");
+	JButton modoEditor = new JButton("Editar");
 	JButton sair = new JButton("Sair");
 	WelcomePage(String userID) {
 		
@@ -26,4 +26,4 @@ public class WelcomePage{
 		frame.setVisible(true);
 
 	}
-}
+} 
