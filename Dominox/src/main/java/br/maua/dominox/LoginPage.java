@@ -31,9 +31,6 @@ public class LoginPage implements ActionListener{
 		
 		messageLabel.setBounds(125,250,250,35);
 		messageLabel.setFont(new Font(null,Font.ITALIC,25));
-		
-                messageLabel.setBounds(125,250,250,35);
-		messageLabel.setFont(new Font(null,Font.ITALIC,25));
                 
 		userIDField.setBounds(125,100,200,25);
 		userPasswordField.setBounds(125,150,200,25);
@@ -46,9 +43,9 @@ public class LoginPage implements ActionListener{
 		resetButton.setFocusable(false);
 		resetButton.addActionListener(this);
 
-        registrateButton.setBounds(125, 200, 100, 25);
-        registrateButton.setFocusable(false);
-        registrateButton.addActionListener(this);
+    registrateButton.setBounds(125, 235, 200, 25);
+    registrateButton.setFocusable(false);
+    registrateButton.addActionListener(this);
 
 		frame.setLocationRelativeTo(null);
 		
@@ -67,6 +64,10 @@ public class LoginPage implements ActionListener{
 
 	}	
 	public void actionPerformed(ActionEvent e){
+		if (e.getSource() == registrateButton) {
+    SignUpPage registerPage = new SignUpPage(logininfo);
+		
+		}
 
 		if(e.getSource()==resetButton) {
 			userIDField.setText("");
