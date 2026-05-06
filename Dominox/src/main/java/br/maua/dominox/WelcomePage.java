@@ -12,7 +12,7 @@ public class WelcomePage {
     JButton editorButton = new JButton("Modo Editor");
     JButton sairButton = new JButton("Sair");
 
-    public WelcomePage(String emailUsuario) {
+    public WelcomePage() {
         try {
             // Tenta carregar a imagem do mesmo pacote da classe
             java.net.URL imgURL = WelcomePage.class.getResource("logoDominox.png");
