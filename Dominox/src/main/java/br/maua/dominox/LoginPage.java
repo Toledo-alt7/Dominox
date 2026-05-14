@@ -1,102 +1,82 @@
 package br.maua.dominox;
 
 import java.awt.*;
-import java.awt.event.*;
+
 import javax.swing.*;
-import java.sql.*;
 
-public class LoginPage implements ActionListener {
 
-    JFrame frame = new JFrame("Login - Dominox");
-    JButton loginButton = new JButton("Login");
-    JButton resetButton = new JButton("Limpar");
-    JTextField userIDField = new JTextField();
-    JPasswordField userPasswordField = new JPasswordField();
-    JLabel userIDLabel = new JLabel("Email:");
-    JLabel userPasswordLabel = new JLabel("Senha:");
-    JLabel messageLabel = new JLabel();
+public class LoginPage {
+
+    public JFrame frame = new JFrame("Dominox");
+    public JButton loginButton = new JButton("Login");
+    public JButton resetButton = new JButton("Cancelar");
+    public JButton registerButton = new JButton("Registrar-se");
+    public JTextField userIDField = new JTextField();
+    public JPasswordField userPasswordField = new JPasswordField();
+    public JLabel messageLabel = new JLabel("Não possui uma conta?");
+    public JLabel statusLabel = new JLabel("");
 
     public LoginPage() {
-        userIDLabel.setBounds(50, 100, 75, 25);
-        userPasswordLabel.setBounds(50, 150, 75, 25);
-        messageLabel.setBounds(50, 250, 320, 35);
-        
-        userIDField.setBounds(125, 100, 200, 25);
-        userPasswordField.setBounds(125, 150, 200, 25);
-        
-        loginButton.setBounds(125, 200, 100, 25);
-        loginButton.addActionListener(this);
-        
-        resetButton.setBounds(225, 200, 100, 25);
-        resetButton.addActionListener(this);
-
-        frame.add(userIDLabel);
-        frame.add(userPasswordLabel);
-        frame.add(messageLabel);
-        frame.add(userIDField);
-        frame.add(userPasswordField);
-        frame.add(loginButton);
-        frame.add(resetButton);
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(420, 420);
-        frame.setLayout(null);
+        frame.setSize(500, 500);
+        frame.setMinimumSize(new Dimension(450, 400));
+        frame.setLayout(new GridBagLayout());
+		frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+        addComponents();
+
+        
+        ActionHandler handler = new ActionHandler(this);
+        loginButton.addActionListener(handler);
+        resetButton.addActionListener(handler);
+        registerButton.addActionListener(handler);
+
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == resetButton) {
-            userIDField.setText("");
-            userPasswordField.setText("");
-        }
-        if (e.getSource() == loginButton) {
-            validarAcesso();
-        }
-    }
-
-    private void validarAcesso() {
-        String email = userIDField.getText();
-        String senha = String.valueOf(userPasswordField.getPassword());
+    private void addComponents() {
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 10, 10, 10);
         
-        // Query que busca o ID e o Status do usuário
-        String sql = "SELECT id_usuario, ativo FROM usuario WHERE email = ? AND senha = ?";
+        c.gridx = 0;
+        c.gridy = 0;
+        frame.add(new JLabel("Usuário:"), c);
 
-        try (Connection conn = Conexao.getConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            if (conn == null) {
-                messageLabel.setText("Erro: Banco de dados inacessível.");
-                return;
-            }
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1.0;
+        frame.add(userIDField, c);
 
-            stmt.setString(1, email);
-            stmt.setString(2, senha);
-            ResultSet rs = stmt.executeQuery();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weightx = 0;
+        frame.add(new JLabel("Senha:"), c);
 
-            if (rs.next()) {
-                int idRecuperado = rs.getInt("id_usuario");
-                boolean ativo = rs.getBoolean("ativo");
+        c.gridx = 1;
+        c.gridy = 1;
+        frame.add(userPasswordField, c);
 
-                if (ativo) {
-                    frame.dispose();
-                    new WelcomePage();
-                } else {
-                    messageLabel.setForeground(Color.orange);
-                    messageLabel.setText("Esta conta está inativa.");
-                }
-            } else {
-                messageLabel.setForeground(Color.red);
-                messageLabel.setText("Email ou senha incorretos.");
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-    public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-        new LoginPage();
-    });
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 5, 0));
+        buttonPanel.add(loginButton);
+        buttonPanel.add(resetButton);
+        
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 2;
+        frame.add(buttonPanel, c);
+
+        c.gridy = 3;
+        statusLabel.setHorizontalAlignment(JLabel.CENTER);
+        frame.add(statusLabel, c);
+
+        c.gridy = 4;
+        messageLabel.setHorizontalAlignment(JLabel.CENTER);
+        frame.add(messageLabel, c);
+
+        c.gridy = 5;
+        frame.add(registerButton, c);
     }
 }
+
