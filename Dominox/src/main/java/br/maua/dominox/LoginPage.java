@@ -1,7 +1,9 @@
 package br.maua.dominox;
 
 import java.awt.*;
+
 import javax.swing.*;
+
 
 public class LoginPage {
 
@@ -77,3 +79,4 @@ public class LoginPage {
         frame.add(registerButton, c);
     }
 }
+
