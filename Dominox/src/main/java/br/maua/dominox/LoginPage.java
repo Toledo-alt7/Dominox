@@ -16,6 +16,9 @@ public class LoginPage {
     public JLabel messageLabel = new JLabel("Não possui uma conta?");
     public JLabel statusLabel = new JLabel("");
 
+
+    public boolean loginPageStats = true;
+
     public LoginPage() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);

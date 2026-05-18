@@ -8,9 +8,11 @@ public class ActionHandler implements ActionListener {
     
     DataBase db;
 
+    ValidateAccess va;
+
     public ActionHandler(LoginPage lp) {
         this.lp = lp;
-        this.db = new DataBase();
+        this.va = new ValidateAccess();
     }
 
     @Override
@@ -23,7 +25,7 @@ public class ActionHandler implements ActionListener {
         }
         
         if (e.getSource() == lp.loginButton) {
-            db.validarAcesso(lp); 
+            va.validarAcesso(lp);
         }
         
         
