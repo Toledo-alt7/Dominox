@@ -1,106 +1,68 @@
 package br.maua.dominox;
 
+
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.Timer;
 import javax.swing.*;
 
-// Classe que configura o painel de login
-
-public class SignUpPage implements ActionListener{
-  
-  JFrame frame = new JFrame();
-  JButton confirmButton = new JButton("Registrar");
-  JButton resetButton = new JButton("Cancelar");
-  JTextField userIDField = new JTextField();
-  JPasswordField userPasswordField = new JPasswordField();
-  JPasswordField confirmPasswordField = new JPasswordField();
-  JLabel userIDLabel = new JLabel("userID:");
-  JLabel userPasswordLabel = new JLabel("password:");
-  JLabel confirmPasswordLabel = new JLabel("Confirmar:");
-  JLabel messageLabel = new JLabel();
-  HashMap<String,String> logininfo;
-
-  SignUpPage(HashMap<String,String> loginInfoOriginal){
+public class SignUpPage {
+    public JFrame frame = new JFrame("Dominox - Cadastro");
+    public JTextField userField = new JTextField();
+    public JPasswordField passField = new JPasswordField();
+    public JPasswordField confirmPassField = new JPasswordField();
+    public JButton registerButton = new JButton("Confirmar Cadastro");
+    public JButton backButton = new JButton("Voltar");
+    public JLabel messageLabel = new JLabel("Crie sua conta preenchendo os dados abaixo.");
     
-    logininfo = loginInfoOriginal;
-  
-    userIDLabel.setBounds(50,100,75,25);
-    userPasswordLabel.setBounds(50,150,75,25);
-    confirmPasswordLabel.setBounds(50,200,75,25);
+    public SignUpPage() {
+        frame.setSize(450, 400);
+        frame.setLayout(new GridBagLayout());
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
+        addComponents();
 
-    messageLabel.setBounds(125,250,250,35);
-    messageLabel.setFont(new Font(null,Font.ITALIC,25));
+        registerButton.addActionListener(e -> {
+            DataBase db = new DataBase();
+            db.cadastrarUsuario(this); 
+        });
 
-    userIDField.setBounds(125,100,200,25);
-    userPasswordField.setBounds(125,150,200,25);
-    confirmPasswordField.setBounds(125,200,200,25);
+        backButton.addActionListener(e -> frame.dispose());
 
-    confirmButton.setBounds(125,240,100,25);
-    confirmButton.setFocusable(false);
-    confirmButton.addActionListener(this);
-
-    resetButton.setBounds(225,240,100,25);
-    resetButton.setFocusable(false);
-    resetButton.addActionListener(this);
-
-    frame.setLocationRelativeTo(null);
-
-    frame.add(userIDLabel);
-    frame.add(userPasswordLabel);
-    frame.add(messageLabel);
-    frame.add(userIDField);
-    frame.add(userPasswordField);
-    frame.add(confirmPasswordLabel);
-    frame.add(confirmPasswordField);
-    frame.add(confirmButton);
-    frame.add(resetButton);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(420,500);
-    frame.setLayout(null);
-    frame.setVisible(true);
-
-  }
-  public void actionPerformed(ActionEvent e){
-
-    if(e.getSource() == resetButton) {
-      frame.dispose(); //fecha o registro, volta para o login
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
-    if(e.getSource() == confirmButton){
-      String userID = userIDField.getText().trim();
-      String password = String.valueOf(userPasswordField.getPassword());
-      String confirmPassword = String.valueOf(confirmPasswordField.getPassword());
-    
-    //Validações
-      if(userID.isEmpty() || password.isEmpty()){
-        messageLabel.setForeground(Color.red);
-        messageLabel.setText("Preencha todos os campos");
-        return;
-    }
-      if(logininfo.containsKey(userID)){
-        messageLabel.setForeground(Color.red);
-        messageLabel.setText("Usuário já existe");
-        return;
-      }
-      if(!password.equals(confirmPassword)){
-        messageLabel.setForeground(Color.red);
-        messageLabel.setText("Senhas não coincidem");
-        return;
-      }
-    
-      // Cadastro bem-sucedido
-      logininfo.put(userID, password);
-      messageLabel.setForeground(Color.green);
-      messageLabel.setText("Cadastro realizado!");
-    
-      // Fecha após 1 segundo 
-      Timer timer = new Timer(1000, event -> frame.dispose());
-      timer.setRepeats(false);
-      timer.start();
+    private void addComponents() {
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 10, 10, 10);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 2;
+        messageLabel.setHorizontalAlignment(JLabel.CENTER);
+        frame.add(messageLabel, c);
+        frame.setMinimumSize(new Dimension(450, 400));
 
-    }
+        c.gridwidth = 1;
+        c.gridy = 1;
+        frame.add(new JLabel("E-mail/Usuário:"), c);
+        c.gridx = 1;
+        frame.add(userField, c);
 
- }
+        c.gridx = 0;
+        c.gridy = 2;
+        frame.add(new JLabel("Senha:"), c);
+        c.gridx = 1;
+        frame.add(passField, c);
+
+        c.gridx = 0;
+        c.gridy = 3;
+        frame.add(new JLabel("Confirmar Senha:"), c);
+        c.gridx = 1;
+        frame.add(confirmPassField, c);
+
+        c.gridx = 0;
+        c.gridy = 4;
+        frame.add(registerButton, c);
+        c.gridx = 1;
+        frame.add(backButton, c);
+    }
 }

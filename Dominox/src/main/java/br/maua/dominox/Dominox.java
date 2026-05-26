@@ -1,14 +1,14 @@
 
 package br.maua.dominox; 
 
+import javax.swing.SwingUtilities;
+
+
 public class Dominox {
+    public static void main(String[] args) {   
 
-    public static void main(String[] args) {
-        		
-		IDandPasswords idandPasswords = new IDandPasswords();
-				
-		LoginPage loginPage = new LoginPage(idandPasswords.getLoginInfo());
-
-
+        SwingUtilities.invokeLater(() -> {
+            new LoginPage();
+        });
     }
 }

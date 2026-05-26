@@ -1,123 +1,94 @@
 package br.maua.dominox;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
 import javax.swing.*;
 
-// Classe que configura o painel de login
+public class LoginPage {
 
-public class LoginPage implements ActionListener{
+    public JFrame frame = new JFrame("Dominox");
+    public JButton loginButton = new JButton("Login");
+    public JButton resetButton = new JButton("Cancelar");
+    public JButton registerButton = new JButton("Registrar-se");
+    public JTextField userIDField = new JTextField();
+    public JPasswordField userPasswordField = new JPasswordField();
+    public JLabel messageLabel = new JLabel("Não possui uma conta?");
+    public JLabel statusLabel = new JLabel("");
+    public JCheckBox remeberMeBox = new JCheckBox("Manter login");
 
-	JFrame frame = new JFrame();
-	JButton loginButton = new JButton("Login");
-	JButton resetButton = new JButton("Cancelar");
-    JButton registrateButton = new JButton("Registrar");
-	JTextField userIDField = new JTextField();
-	JPasswordField userPasswordField = new JPasswordField();
-	JLabel userIDLabel = new JLabel("userID:");
-	JLabel userPasswordLabel = new JLabel("password:");
-	JLabel messageLabel = new JLabel();
-	HashMap<String,String> logininfo = new HashMap<String,String>();
-    IDandPasswords pp = new IDandPasswords();
-    
-    
-	LoginPage(HashMap<String, String> loginInfoOriginal){
 
-		logininfo = loginInfoOriginal;
-		
-		userIDLabel.setBounds(50,100,75,25);
-		userPasswordLabel.setBounds(50,150,75,25);
-		
-		messageLabel.setBounds(125,250,250,35);
-		messageLabel.setFont(new Font(null,Font.ITALIC,25));
-                
-		userIDField.setBounds(125,100,200,25);
-		userPasswordField.setBounds(125,150,200,25);
-		
-		loginButton.setBounds(125,200,100,25);
-		loginButton.setFocusable(false);
-		loginButton.addActionListener(this);
-		
-		resetButton.setBounds(225,200,100,25);
-		resetButton.setFocusable(false);
-		resetButton.addActionListener(this);
+    public boolean loginPageStats = true;
 
-    registrateButton.setBounds(125, 235, 200, 25);
-    registrateButton.setFocusable(false);
-    registrateButton.addActionListener(this);
+    public LoginPage() {
+        // verifica sessão salva antes de mostrar a tela 
+        String savedUser = SessionManager.getSavedUser();
+        if (savedUser != null){
+            new WindowPage();
+            return;
+        }
 
-		frame.setLocationRelativeTo(null);
-		
-		frame.add(userIDLabel);
-		frame.add(userPasswordLabel);
-		frame.add(messageLabel);
-		frame.add(userIDField);
-		frame.add(userPasswordField);
-		frame.add(loginButton);
-		frame.add(resetButton);
-        frame.add(registrateButton);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(420,420);
-		frame.setLayout(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 500);
+        frame.setMinimumSize(new Dimension(450, 400));
+        frame.setLayout(new GridBagLayout());
 		frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+        addComponents();
 
-	}	
-	public void actionPerformed(ActionEvent e){
-		if (e.getSource() == registrateButton) {
-    SignUpPage registerPage = new SignUpPage(logininfo);
-		
-		}
+        ActionHandler handler = new ActionHandler(this);
+        loginButton.addActionListener(handler);
+        resetButton.addActionListener(handler);
+        registerButton.addActionListener(handler);
 
-		if(e.getSource()==resetButton) {
-			userIDField.setText("");
-			userPasswordField.setText("");
-		}
-		
-		if(e.getSource()==loginButton) {
-			
-			String userID = userIDField.getText();
-			String password = String.valueOf(userPasswordField.getPassword());
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
 
-			if(userID.equals("felipe")){ // consertar dps que o banco
-			                             // de dados estiver pronto
-				pp.ID = 1;
-			}
-			else{
-				pp.ID = 0;
-			}
+    private void addComponents() {
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 10, 10, 10);
+        
+        c.gridx = 0;
+        c.gridy = 0;
+        frame.add(new JLabel("Usuário:"), c);
 
-			if(logininfo.containsKey(userID)) {
-				if(logininfo.get(userID).equals(password)) {
-				    if(pp.ID == 1){
-					
-					
-						messageLabel.setForeground(Color.green);
-						messageLabel.setText("Login concluido!");
-						frame.dispose();
-						WelcomePage welcomePage = new WelcomePage(userID);
-				    }
-				    else if(pp.ID == 0){
-						messageLabel.setForeground(Color.green);
-						messageLabel.setText("Login concluido!");
-				      	frame.dispose();
-				       	PainelAluno pa = new PainelAluno(userID);
-					
-				    }
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1.0;
+        frame.add(userIDField, c);
 
-				}
-				
-				else {
-					messageLabel.setForeground(Color.red);
-					messageLabel.setText("Senha incorreta");
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weightx = 0;
+        frame.add(new JLabel("Senha:"), c);
 
-				}
-			}
-			else {
-				messageLabel.setForeground(Color.red);
-				messageLabel.setText("Usuário não encontrado");
+        c.gridx = 1;
+        frame.add(userPasswordField, c);
 
-			}
-		}
-	} 
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 2;
+        frame.add(remeberMeBox, c);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 5, 0));
+        buttonPanel.add(loginButton);
+        buttonPanel.add(resetButton);
+        
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 0;
+        frame.add(buttonPanel, c);
+
+        c.gridy = 4;
+        statusLabel.setHorizontalAlignment(JLabel.CENTER);
+        frame.add(statusLabel, c);
+
+        c.gridy = 5;
+        messageLabel.setHorizontalAlignment(JLabel.CENTER);
+        frame.add(messageLabel, c);
+
+        c.gridy = 6;
+        frame.add(registerButton, c);
+    }
 }
+
