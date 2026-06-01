@@ -151,9 +151,7 @@ public class DominoxJogo extends JFrame {
         bot2Card.add(bot2Label);
         bot2Outer.add(bot2Card, BorderLayout.CENTER);
 
-        // Board (scrollable)
-        painelTabuleiro = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 4));
-        painelTabuleiro.setOpaque(false);
+        painelTabuleiro = new TabuleiroPanel();
 
         scrollTabuleiro = new JScrollPane(painelTabuleiro);
         scrollTabuleiro.setOpaque(false);
@@ -169,23 +167,23 @@ public class DominoxJogo extends JFrame {
     }
 
     // embaixo: status + Pecas + buttons
+    // ── Embaixo: peças + botões ───────────────────────────────
+
     private JPanel construirEmbaixo() {
         JPanel embaixo = new JPanel(new BorderLayout(0, 4));
         embaixo.setOpaque(false);
         embaixo.setBorder(new EmptyBorder(2, 14, 10, 14));
 
-        // Red Pecas area — aligned to PNG red rectangle (centered, side margins ~27% each side)
-        JPanel PecasOuter = new JPanel(new BorderLayout());
-        PecasOuter.setOpaque(false);
-        // esquerda and right spacers to match the red rectangle position in the PNG
-        PecasOuter.setBorder(new EmptyBorder(4, 0, 30, 0));
+        JPanel pecasOuter = new JPanel(new BorderLayout());
+        pecasOuter.setOpaque(false);
+        pecasOuter.setBorder(new EmptyBorder(4, 0, 30, 0));
 
-        JPanel esquerdaSpacer  = new JPanel(); esquerdaSpacer.setOpaque(false);
-        JPanel rightSpacer = new JPanel(); rightSpacer.setOpaque(false);
-        esquerdaSpacer .setPreferredSize(new Dimension(300, 0)); // ~gap on esquerda matching PNG
-        rightSpacer.setPreferredSize(new Dimension(300, 0)); // ~gap on right matching PNG
+        JPanel esquerdaSpacer = new JPanel(); esquerdaSpacer.setOpaque(false);
+        JPanel rightSpacer    = new JPanel(); rightSpacer.setOpaque(false);
+        esquerdaSpacer.setPreferredSize(new Dimension(300, 0));
+        rightSpacer   .setPreferredSize(new Dimension(300, 0));
 
-        JPanel PecasArea = new JPanel(new BorderLayout()) {
+        JPanel pecasArea = new JPanel(new BorderLayout()) {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -193,40 +191,46 @@ public class DominoxJogo extends JFrame {
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
             }
         };
-        PecasArea.setOpaque(false);
-        PecasArea.setBorder(new EmptyBorder(10, 12, 10, 12));
+        pecasArea.setOpaque(false);
+        pecasArea.setBorder(new EmptyBorder(10, 12, 10, 12));
 
         playerPecasPainel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 3));
         playerPecasPainel.setOpaque(false);
-        PecasArea.add(playerPecasPainel, BorderLayout.CENTER);
+        pecasArea.add(playerPecasPainel, BorderLayout.CENTER);
 
-        PecasOuter.add(esquerdaSpacer,  BorderLayout.WEST);
-        PecasOuter.add(PecasArea,    BorderLayout.CENTER);
-        PecasOuter.add(rightSpacer, BorderLayout.EAST);
+        pecasOuter.add(esquerdaSpacer, BorderLayout.WEST);
+        pecasOuter.add(pecasArea,      BorderLayout.CENTER);
+        pecasOuter.add(rightSpacer,    BorderLayout.EAST);
 
-        // Buttons row
         JPanel btnRow = new JPanel(new BorderLayout());
         btnRow.setOpaque(false);
         btnRow.setBorder(new EmptyBorder(4, 0, 0, 0));
 
         JPanel btnsEsquerda = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
         btnsEsquerda.setOpaque(false);
-        btnEsquerdo  = fazerBtnAcao("← Esquerda");
-        btnDireito = fazerBtnAcao("Direita →");
-        btnPassar  = fazerBtnAcao("Passar ⏭");
-        btnEsquerdo .addActionListener(e -> doPlay(true));
-        btnDireito.addActionListener(e -> doPlay(false));
-        btnPassar .addActionListener(e -> doPass());
+        btnEsquerdo = fazerBtnAcao("← Esquerda");
+        btnDireito  = fazerBtnAcao("Direita →");
+        btnPassar   = fazerBtnAcao("Passar ⏭");
+        btnEsquerdo.addActionListener(e -> doPlay(true));
+        btnDireito .addActionListener(e -> doPlay(false));
+        btnPassar  .addActionListener(e -> doPass());
         btnsEsquerda.add(btnEsquerdo);
         btnsEsquerda.add(btnDireito);
         btnsEsquerda.add(btnPassar);
 
-        btnRow.add(btnsEsquerda,  BorderLayout.CENTER);
+        // Botão de ajuda verde no canto direito
+        JPanel btnsDireita = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        btnsDireita.setOpaque(false);
+        btnsDireita.add(fazerBtnAjuda());
 
-        embaixo.add(PecasOuter, BorderLayout.CENTER);
-        embaixo.add(btnRow,    BorderLayout.SOUTH);
+        btnRow.add(btnsEsquerda, BorderLayout.CENTER);
+        btnRow.add(btnsDireita,  BorderLayout.EAST);
+
+        embaixo.add(pecasOuter, BorderLayout.CENTER);
+        embaixo.add(btnRow,     BorderLayout.SOUTH);
         return embaixo;
     }
+    
 
     // ── HELPERS ─────────────────────────────────────────────────────────────
 
@@ -301,6 +305,34 @@ public class DominoxJogo extends JFrame {
         });
         return btn;
     }
+
+    private JButton fazerBtnAjuda() {
+        JButton btn = new JButton("?") {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new Color(20, 130, 60, 180));
+                g2.fillOval(0, 0, getWidth(), getHeight());
+                int pad = 5;
+                g2.setColor(new Color(30, 160, 75));
+                g2.fillOval(pad, pad, getWidth()-pad*2, getHeight()-pad*2);
+                g2.setColor(new Color(50, 200, 90));
+                g2.setStroke(new BasicStroke(2.5f));
+                g2.drawOval(pad, pad, getWidth()-pad*2, getHeight()-pad*2);
+                super.paintComponent(g);
+            }
+        };
+        btn.setPreferredSize(new Dimension(55, 55));
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 22));
+        btn.setFocusPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.addActionListener(e -> PainelAjuda.mostrar(this));
+        return btn;
+    }
+
 
     // ═══════════════════════════════ reiniciar ════════════════════════════════
 

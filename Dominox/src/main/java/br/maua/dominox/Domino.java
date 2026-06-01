@@ -1,4 +1,5 @@
 package br.maua.dominox;
+
 public class Domino {
     private String left;
     private String right;
