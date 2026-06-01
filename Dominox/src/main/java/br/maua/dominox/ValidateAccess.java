@@ -32,6 +32,13 @@ public class ValidateAccess {
                         int idRecuperado = rs.getInt("id_usuario");
                         boolean ativo = rs.getBoolean("ativo"); 
                         if (ativo) {
+                            // Salva sessão se checkbox marcado, limpa se não
+                            if (loginPage.remeberMeBox.isSelected()){
+                                SessionManager.saveSession(email);
+                            } 
+                            else{
+                                SessionManager.clearSession();
+                            }
                             loginPage.frame.dispose();
                             new WindowPage();
                             
