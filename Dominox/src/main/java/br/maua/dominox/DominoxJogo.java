@@ -27,9 +27,11 @@ public class DominoxJogo extends JFrame {
     private JButton btnEsquerdo, btnDireito, btnPassar;
 
     public DominoxJogo() {
-        try { bgImagem = ImageIO.read(new File("background.png")); }
+        try { bgImagem = ImageIO.read(new File("src\\main\\java\\br\\maua\\dominox\\background.png")); }
         catch (Exception e) { bgImagem = null; }
-        engine = new GameEngine();
+        engine = new GameEngine(FaseRegistry.getFase(1
+            //Alterar esse 1 para o número da fase atual!
+        ));
         iniciarUI();
         reiniciar();
     }
@@ -393,8 +395,7 @@ public class DominoxJogo extends JFrame {
             DominoPanel dp = new DominoPanel(d.getLeft(), d.getRight());
             boolean sel = (d == dominoSelecionado);
             boolean playable = myTurn && !engine.isBoardEmpty() &&
-                (ChemistryRules.dominoFits(d, engine.getLeftEnd()) ||
-                 ChemistryRules.dominoFits(d, engine.getRightEnd()));
+                (Fase.dominoEncaixa(d, engine.getLeftEnd()) || Fase.dominoEncaixa(d, engine.getRightEnd())); 
             dp.setSelected(sel);
             dp.setPlayable(!sel && playable);
             dp.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -412,7 +413,7 @@ public class DominoxJogo extends JFrame {
     }
 
     private void reiniciarButtons() {
-        boolean myTurn = engine.isHumanTurn() && !engine.isJogoOver();
+        boolean myTurn = engine.isHumanTurn() && !engine.isGameOver();
         boolean hasSel = dominoSelecionado != null;
         btnEsquerdo .setEnabled(myTurn && hasSel);
         btnDireito.setEnabled(myTurn && hasSel);
@@ -427,7 +428,7 @@ public class DominoxJogo extends JFrame {
         if (!ok) { showMsg(engine.getStatusMessage()); return; }
         dominoSelecionado = null;
         reiniciar(); checkJogoOver();
-        if (!engine.isJogoOver()) scheduleBotTurns();
+        if (!engine.isGameOver()) scheduleBotTurns();
     }
 
     private void doPass() {
@@ -435,11 +436,11 @@ public class DominoxJogo extends JFrame {
         if (!ok) { showMsg(engine.getStatusMessage()); return; }
         dominoSelecionado = null;
         reiniciar(); checkJogoOver();
-        if (!engine.isJogoOver()) scheduleBotTurns();
+        if (!engine.isGameOver()) scheduleBotTurns();
     }
 
     private void scheduleBotTurns() {
-        if (engine.isHumanTurn() || engine.isJogoOver()) return;
+        if (engine.isHumanTurn() || engine.isGameOver()) return;
         Timer t = new Timer(900, e -> {
             try {
                 Thread.sleep(2000);
@@ -447,13 +448,13 @@ public class DominoxJogo extends JFrame {
                 e1.printStackTrace();
             }
             engine.botPlay(); reiniciar(); checkJogoOver();
-            if (!engine.isJogoOver() && !engine.isHumanTurn()) scheduleBotTurns();
+            if (!engine.isGameOver() && !engine.isHumanTurn()) scheduleBotTurns();
         });
         t.setRepeats(false); t.start();
     }
 
     private void checkJogoOver() {
-        if (!engine.isJogoOver()) return;
+        if (!engine.isGameOver()) return;
         reiniciar();
         int choice = JOptionPane.showConfirmDialog(this,
             engine.getWinner() + "\n\nDeseja jogar novamente?",
