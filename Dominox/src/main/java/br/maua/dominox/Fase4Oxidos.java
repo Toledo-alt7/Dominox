@@ -1,5 +1,7 @@
 package br.maua.dominox;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class Fase4Oxidos implements Fase{
@@ -46,6 +48,42 @@ public class Fase4Oxidos implements Fase{
 
     public String[][] getPecas() {
         return PECAS;
+    }
+
+    private Map<String, Set<String>> conexoes;
+    public Fase4Oxidos(){
+        conexoes = new HashMap<>();
+        selfConnect(conexoes, "Ácido");
+        selfConnect(conexoes, "Básico");
+        selfConnect(conexoes, "Neutro");
+        selfConnect(conexoes, "Anfótero");
+        selfConnect(conexoes, "Iônico");
+        selfConnect(conexoes, "Covalente");
+        selfConnect(conexoes, "CO₂");
+        selfConnect(conexoes, "SO₃");
+        selfConnect(conexoes, "CaO");
+        selfConnect(conexoes, "Na₂O");
+        selfConnect(conexoes, "CO");
+        selfConnect(conexoes, "Al₂O₃");
+
+        connect(conexoes, "Ácido", "CO₂");
+        connect(conexoes, "Ácido", "SO₃");
+
+        connect(conexoes, "Básico", "CaO");
+        connect(conexoes, "Básico", "Na₂O");
+
+        connect(conexoes, "Neutro", "CO");
+
+        connect(conexoes, "Anfótero", "Al₂O₃");
+
+        connect(conexoes, "Iônico", "CaO");
+        connect(conexoes, "Iônico", "Na₂O");
+        connect(conexoes, "Iônico", "Al₂O₃");
+
+        connect(conexoes, "Covalente", "CO₂");
+        connect(conexoes, "Covalente", "SO₃");
+        connect(conexoes, "Covalente", "CO");
+
     }
 
     @Override
