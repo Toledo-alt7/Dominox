@@ -7,6 +7,7 @@ public class Tabuleiro {
     private List<Domino> board;
     private String leftEnd;
     private String rightEnd;
+    private Fase faseAtual;
 
     void placeDomino(Domino d, boolean leftFacesLeft) {
         board.add(d);
@@ -21,8 +22,8 @@ public class Tabuleiro {
 
 
     void orientAndPlace(Domino d, String targetEnd, boolean toLeft) {
-        boolean leftConnects  = ChemistryRules.canConnect(d.getLeft(), targetEnd);
-        boolean rightConnects = ChemistryRules.canConnect(d.getRight(), targetEnd);
+        boolean leftConnects  = faseAtual.validarConexao(d.getLeft(), targetEnd);
+        boolean rightConnects = faseAtual.validarConexao(d.getRight(), targetEnd);
 
         if (toLeft) {
             if (!rightConnects && leftConnects) {

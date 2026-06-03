@@ -5,6 +5,7 @@ public class Player {
     private final String name;
     private final boolean isHuman;
     private final List<Domino> Pecas;
+    private Fase faseAtual;
 
     public Player(String name, boolean isHuman) {
         this.name = name;
@@ -22,7 +23,7 @@ public class Player {
 
     public boolean hasPlayable(String leftEnd, String rightEnd, boolean boardEmpty) {
         for (Domino d : Pecas) {
-            if (boardEmpty || ChemistryRules.dominoFits(d, leftEnd) || ChemistryRules.dominoFits(d, rightEnd))
+            if (boardEmpty || faseAtual.dominoEncaixa(d, leftEnd) || faseAtual.dominoEncaixa(d, rightEnd))
                 return true;
         }
         return false;
@@ -31,7 +32,7 @@ public class Player {
     /** Bot AI: pick the first domino that fits either end. Returns null if none. */
     public Domino pickBotMove(String leftEnd, String rightEnd, boolean boardEmpty) {
         for (Domino d : Pecas) {
-            if (boardEmpty || ChemistryRules.dominoFits(d, leftEnd) || ChemistryRules.dominoFits(d, rightEnd))
+            if (boardEmpty || faseAtual.dominoEncaixa(d, leftEnd) || faseAtual.dominoEncaixa(d, rightEnd))
                 return d;
         }
         return null;

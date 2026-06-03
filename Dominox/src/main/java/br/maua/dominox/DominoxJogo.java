@@ -16,6 +16,7 @@ public class DominoxJogo extends JFrame {
     private BufferedImage bgImagem;
     private GameEngine    engine;
     private Domino        dominoSelecionado = null;
+    private Fase faseAtual;
 
     private JPanel      painelTabuleiro;
     private JScrollPane scrollTabuleiro;
@@ -26,12 +27,10 @@ public class DominoxJogo extends JFrame {
 
     private JButton btnEsquerdo, btnDireito, btnPassar;
 
-    public DominoxJogo() {
+    public DominoxJogo(Fase faseAtual) {
         try { bgImagem = ImageIO.read(new File("src\\main\\java\\br\\maua\\dominox\\background.png")); }
         catch (Exception e) { bgImagem = null; }
-        engine = new GameEngine(FaseRegistry.getFase(1
-            //Alterar esse 1 para o número da fase atual!
-        ));
+        engine = new GameEngine(faseAtual);
         iniciarUI();
         reiniciar();
     }
@@ -395,7 +394,7 @@ public class DominoxJogo extends JFrame {
             DominoPanel dp = new DominoPanel(d.getLeft(), d.getRight());
             boolean sel = (d == dominoSelecionado);
             boolean playable = myTurn && !engine.isBoardEmpty() &&
-                (Fase.dominoEncaixa(d, engine.getLeftEnd()) || Fase.dominoEncaixa(d, engine.getRightEnd())); 
+                (faseAtual.dominoEncaixa(d, engine.getLeftEnd()) || faseAtual.dominoEncaixa(d, engine.getRightEnd())); 
             dp.setSelected(sel);
             dp.setPlayable(!sel && playable);
             dp.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -473,11 +472,11 @@ public class DominoxJogo extends JFrame {
 
     // ═══════════════════════════════ MAIN ═══════════════════════════════════
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-            catch (Exception ignored) {}
-            new DominoxJogo().setVisible(true);
-        });
-    }
+    // public static void main(String[] args) {
+    //     SwingUtilities.invokeLater(() -> {
+    //         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+    //         catch (Exception ignored) {}
+    //         new DominoxJogo().setVisible(true);
+    //     });
+    // }
 }
