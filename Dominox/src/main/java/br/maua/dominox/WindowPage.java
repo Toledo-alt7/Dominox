@@ -131,7 +131,9 @@ public class WindowPage {
     }
 
     private void iniciarFase(int numeroFase){
-        JOptionPane.showMessageDialog(frame, "Iniciando Fase " +  numeroFase + "...");
+        Fase faseAtual = FaseRegistry.getFase(numeroFase);
+        new DominoxJogo(faseAtual).setVisible(true);
+        frame.dispose();
     }
 
     private void sairDaConta(){

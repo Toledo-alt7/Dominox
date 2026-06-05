@@ -5,11 +5,13 @@ public class Player {
     private final String name;
     private final boolean isHuman;
     private final List<Domino> Pecas;
+    private final Fase faseAtual;
 
-    public Player(String name, boolean isHuman) {
+    public Player(String name, boolean isHuman, Fase faseAtual) {
         this.name = name;
         this.isHuman = isHuman;
         this.Pecas = new ArrayList<>();
+        this.faseAtual = faseAtual;
     }
 
     public String getName()       { return name; }
@@ -22,27 +24,33 @@ public class Player {
 
     public boolean hasPlayable(String leftEnd, String rightEnd, boolean boardEmpty) {
         for (Domino d : Pecas) {
-            if (boardEmpty || ChemistryRules.dominoFits(d, leftEnd) || ChemistryRules.dominoFits(d, rightEnd))
+            if (boardEmpty || encaixa(d, leftEnd) || encaixa(d, rightEnd))
                 return true;
         }
         return false;
     }
 
-    /** Bot AI: pick the first domino that fits either end. Returns null if none. */
     public Domino pickBotMove(String leftEnd, String rightEnd, boolean boardEmpty) {
         for (Domino d : Pecas) {
-            if (boardEmpty || ChemistryRules.dominoFits(d, leftEnd) || ChemistryRules.dominoFits(d, rightEnd))
+            if (boardEmpty || encaixa(d, leftEnd) || encaixa(d, rightEnd))
                 return d;
         }
         return null;
     }
 
     public int countPips() {
-        // For scoring: count total "weight" — just Pecas size since values aren't numeric
         return Pecas.size();
     }
 
     public boolean hasEmptyPecas() { return Pecas.isEmpty(); }
+
+    public Fase getFaseAtual() {
+        return faseAtual;
+    }
+
+    private boolean encaixa(Domino d, String end) {
+        return faseAtual != null && faseAtual.dominoEncaixa(d, end);
+    }
 
     @Override
     public String toString() { return name; }

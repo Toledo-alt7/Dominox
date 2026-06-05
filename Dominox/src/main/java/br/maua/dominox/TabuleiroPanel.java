@@ -90,7 +90,6 @@ public class TabuleiroPanel extends JPanel {
         if (pecas == null || pecas.isEmpty()) {
             g.setColor(new Color(255, 255, 255, 120));
             g.setFont(new Font("SansSerif", Font.ITALIC, 13));
-            g.drawString("Mesa vazia — jogue a primeira peça", 20, 28);
             return;
         }
 

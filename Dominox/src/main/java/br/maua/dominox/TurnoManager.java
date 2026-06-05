@@ -7,7 +7,11 @@ public class TurnoManager {
     private int currentPlayerIndex;
     private boolean gameOver;
     private String winner;
-    private GameEngine engine;
+    private final GameEngine engine;
+
+    public TurnoManager(GameEngine engine){
+        this.engine = engine;
+    }
 
     public void iniciar (List<Player> players){
         this.players = players;

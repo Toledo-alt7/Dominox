@@ -6,11 +6,11 @@ public class GameEngine {
     private Tabuleiro tabuleiro;
     private TurnoManager turnoManager;
     private Fase faseAtual;
-
+    
     public GameEngine(Fase fase) {
         this.faseAtual = fase;
-        tabuleiro = new Tabuleiro();
-        turnoManager = new TurnoManager();
+        tabuleiro = new Tabuleiro(faseAtual);
+        turnoManager = new TurnoManager(this);
         startNewJogo();
     }
 
@@ -27,10 +27,10 @@ public class GameEngine {
 
         List<Player> players;
         players = new ArrayList<>();
-        players.add(new Player("Você", true));
-        players.add(new Player("Bot 1", false));
-        players.add(new Player("Bot 2", false));
-        players.add(new Player("Bot 3", false));
+        players.add(new Player("Você", true, faseAtual));
+        players.add(new Player("Bot 1", false, faseAtual));
+        players.add(new Player("Bot 2", false, faseAtual));
+        players.add(new Player("Bot 3", false, faseAtual));
 
         turnoManager.iniciar(players);
 
