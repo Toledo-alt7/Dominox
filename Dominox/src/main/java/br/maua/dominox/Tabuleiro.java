@@ -7,8 +7,12 @@ public class Tabuleiro {
     private List<Domino> board;
     private String leftEnd;
     private String rightEnd;
-    private Fase faseAtual;
+    private Fase fase;
 
+    public Tabuleiro(Fase fase){
+        this.fase = fase;
+
+    }
     void placeDomino(Domino d, boolean leftFacesLeft) {
         board.add(d);
         if (leftFacesLeft) {
@@ -22,8 +26,8 @@ public class Tabuleiro {
 
 
     void orientAndPlace(Domino d, String targetEnd, boolean toLeft) {
-        boolean leftConnects  = faseAtual.validarConexao(d.getLeft(), targetEnd);
-        boolean rightConnects = faseAtual.validarConexao(d.getRight(), targetEnd);
+        boolean leftConnects  = fase.validarConexao(d.getLeft(), targetEnd);
+        boolean rightConnects = fase.validarConexao(d.getRight(), targetEnd);
 
         if (toLeft) {
             if (!rightConnects && leftConnects) {

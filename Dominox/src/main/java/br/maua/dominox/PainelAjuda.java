@@ -7,10 +7,6 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
-/**
- * Painel de ajuda flutuante com tópicos e subtópicos expansíveis.
- * Exibido como um JDialog sobre o jogo.
- */
 public class PainelAjuda extends JDialog {
 
     // ── Paleta ────────────────────────────────────────────────
@@ -50,69 +46,11 @@ public class PainelAjuda extends JDialog {
         }
     }
 
-    // ── Conteúdo da ajuda ─────────────────────────────────────
-
-    private static final List<Topico> TOPICOS = new ArrayList<>();
-
-    static {
-        TOPICOS.add(new Topico("Ácido", "")
-            .add("Descrição de Ácido", "Ácidos são compostos covalentes, ou seja, que compartilham elétrons nas suas ligações.\n" + 
-                "Eles têm a capacidade de ionizar em água e formar cargas, liberando o H+ como único cátion.)")
-            .add("Classificação por nº de H⁺ ionizável",
-                "• Monoácido: 1 H⁺ ionizável\n" +
-                "• Diácido: 2 H⁺ ionizáveis\n" +
-                "• Triácido: 3 H⁺ ionizáveis")
-            .add("Força dos ácidos",
-                "• Forte: ionização quase completa. Grau de ionização maior que 50%.\n" +
-                "• Moderado: ionização parcial. Grau de ionização entre 5% e 50%.\n" +
-                "• Fraco: ionização pequena. Grau de ionização menor que 5%.")
-            .add("Oxiácidos / Hidrácidos",
-                "• Oxiácido: contém oxigênio.\n" +
-                "• Hidrácido: sem oxigênio.")
-        );
-
-        TOPICOS.add(new Topico("Base", "")
-            .add("Descrição de Base", "Bases são compostos iônicos formados por cátions, na maioria das vezes de metais, que se dissociam em água liberando o ânion hidróxido (OH-).")
-            .add("Classificação por nº de OH⁻",
-                "• Monobase: 1 hidroxila (OH-).\n" +
-                "• Dibase: 2 hidroxilas (OH-).\n" +
-                "• Tribase: 3 hidroxilas (OH-).")
-            .add("Força das bases",
-                "• Forte: dissociação quase completa. São bases de metais alcalinos e alcalino-terrosos. São exceções: Mg(OH)₂ e Be(OH)₂.\n" +
-                "• Fraco: dissociação parcial. São bases de elementos que não pertencem aos grupos 1 e 2.")
-        );
-
-        // TOPICOS.add(new Topico("Sal",
-        //     "Produto da reação entre ácido e base (neutralização). " +
-        //     "Contém cátion diferente de H⁺ e ânion diferente de OH⁻.")
-        //     .add("Classificação dos sais",
-        //         "• Sal neutro: sem H⁺ ou OH⁻ ionizável\n" +
-        //         "• Sal ácido: ainda possui H⁺ ionizável\n" +
-        //         "• Sal básico: ainda possui OH⁻")
-        // );
-
-        // TOPICOS.add(new Topico("Óxido",
-        //     "Composto binário formado por oxigênio e outro elemento. " +
-        //     "Podem ser ácidos, básicos, anfóteros ou neutros.")
-        //     .add("Óxido ácido (anidrido)",
-        //         "Reage com água formando ácido.\n" +
-        //         "Ex: CO₂ + H₂O → H₂CO₃")
-        //     .add("Óxido básico",
-        //         "Reage com água formando base.\n" +
-        //         "Ex: Na₂O + H₂O → 2 NaOH")
-        //     .add("Óxido anfótero",
-        //         "Reage tanto com ácidos quanto com bases.\n" +
-        //         "Ex: Al₂O₃, ZnO")
-        //     .add("Óxido neutro",
-        //         "Não reage com ácidos nem bases.\n" +
-        //         "Ex: CO, NO")
-        // );
-    }
-
+    
     // ── Construtor ────────────────────────────────────────────
 
-    public PainelAjuda(JFrame owner) {
-        super(owner, "Ajuda — Química Inorgânica", true);
+    public PainelAjuda(JFrame owner, Fase fase) {
+        super(owner, fase.getNome(), true);
         setUndecorated(true);
         setSize(520, 580);
         setLocationRelativeTo(owner);
@@ -129,7 +67,7 @@ public class PainelAjuda extends JDialog {
         root.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         root.add(buildHeader(), BorderLayout.NORTH);
-        root.add(buildContent(), BorderLayout.CENTER);
+        root.add(buildContent(fase), BorderLayout.CENTER);
 
         // Arredondamento da janela
         setBackground(new Color(0, 0, 0, 0));
@@ -179,15 +117,80 @@ public class PainelAjuda extends JDialog {
         return header;
     }
 
+    private List<Topico> getTopicosPorFase(Fase fase) {
+    List<Topico> topicos = new ArrayList<>();
+
+    // Tópicos
+    switch (fase.getNumeroFase()) {
+        case 1: // Ácidos e Bases - 1
+            topicos.add(new Topico("Ácido", "")
+                .add("Descrição Geral", "Compostos covalentes que têm a capacidade de ionizar em água e formar cargas, liberando o H+ como único cátion.")
+                .add("Classificação po número de hidrogênios ionizáveis", "Monoácido - possuem apenas um hidrogênio ionizável.\nDiácido - possuem dois hidrogênios ionizáveis.\nTriácido - possuem três hidrogênios ionizáveis.")
+                .add("Classificação por força", "Forte - possuem grau de ionização superior a 50%\nModerado - possuem grau de ionização entre 5% e 50%\nFraco - possuem grau de ionização inferior a 5%.")
+                .add("Classificação por presença de Oxigênio", "Hidrácido - Não possui Oxigênio na sua composição.\nOxiácido - Possui Oxigênio na sua composição."));
+
+            topicos.add(new Topico("Base", "")
+                .add("Descrição Geral", "Compostos iônicos formados por cátions que liberam OH⁻ em solução.")
+                .add("Classificação por número de hidroxilas", "Monobase - Apenas uma hidroxila (OH-)\nDibase - Duas hidroxilas (OH-)\nTribase - Três hidroxilas (OH-)")
+                .add("Força", "Forte - possuem grau de dissociação praticamente 100%. São fortes: Bases de metais alcalinos e bases de metais alcalino-terrosos, com exceção de Be(OH)₂ e Mg(OH)₂ \nFraca - possuem grau de dissociação inferior a 5%."));
+            break;
+
+        case 2: // Ácidos e Bases - 2
+            topicos.add(new Topico("Ácido", "")
+                .add("Descrição Geral", "Compostos covalentes que têm a capacidade de ionizar em água e formar cargas, liberando o H+ como único cátion.")
+                .add("Classificação po número de hidrogênios ionizáveis", "Monoácido - possuem apenas um hidrogênio ionizável.\nDiácido - possuem dois hidrogênios ionizáveis.\nTriácido - possuem três hidrogênios ionizáveis.\nTetrácido - possuem quatro hidrogênios ionizáveis.")
+                .add("Classificação por força", "Forte - possuem grau de ionização superior a 50%\nModerado - possuem grau de ionização entre 5% e 50%\nFraco - possuem grau de ionização inferior a 5%.")
+                .add("Classificação por presença de Oxigênio", "Hidrácido - Não possui Oxigênio na sua composição.\nOxiácido - Possui Oxigênio na sua composição."));
+
+            topicos.add(new Topico("Base", "")
+                .add("Descrição Geral", "Compostos iônicos formados por cátions que liberam OH⁻ em solução.")
+                .add("Classificação por número de hidroxilas", "Monobase - Apenas uma hidroxila (OH-)\nDibase - Duas hidroxilas (OH-)\nTribase - Três hidroxilas (OH-)\nTetrabase - Quatro Hidroxilas (OH-)")
+                .add("Força", "Forte - possuem grau de dissociação praticamente 100%. São fortes: Bases de metais alcalinos e bases de metais alcalino-terrosos, com exceção de Be(OH)₂ e Mg(OH)₂ \nFraca - possuem grau de dissociação inferior a 5%."));
+            break;
+
+        case 3: // Sais
+            topicos.add(new Topico("Sais", "")
+                .add("Classificação por caráter", "Neutro - Quando são dissolvidos em água não alteram o pH.\nÁcido - Quando são dissolvidos em água fazem o pH da solução ficar menor que 7.\nBásico - Quando são dissolvidos em água fazem o pH da solução ficar maior que 7.")
+                .add("Classificação por solubilidade", "Solúvel - Nitratos, Cloratos, Acetatos (Excluindo Acetato de Prata), Cloretos, Brometos, Iodetos e Sulfatos\nInsolúvel - Sulfetos, Carbonatos e Fosfatos")
+                .add("Classificação por presença de Oxigênio", "Halóides - Sem presença de Oxigênio.\nOxissais - Com presença de Oxigênio"));
+            break;
+
+        case 4: // Óxidos
+            topicos.add(new Topico("Óxidos", "")
+                .add("Classificação pelo caráter", "Ácido - Em solução aquosa reagem com a água e formam ácidos.\nBásico - Em solução aquosa alteram o pH para maior que 7.\nAnfótero - Podem se comportar como ácidos ou bases.\nNeutro - Alguns óxidos que não reagem com a água.")
+                .add("Classificação pelas ligações", "Iônicos - Combinação do oxigênio com metais.\nCovalentes - Combinação do oxigênio com elementos não metálicos."));
+            break;
+
+        case 5: // Geral
+            topicos.add(new Topico("Ácido", "")
+                .add("Descrição Geral", "Compostos covalentes que têm a capacidade de ionizar em água e formar cargas, liberando o H+ como único cátion.")
+                .add("Classificação por força", "Forte - possuem grau de ionização superior a 50%\nModerado - possuem grau de ionização entre 5% e 50%\nFraco - possuem grau de ionização inferior a 5%."));
+            topicos.add(new Topico("Base", "")
+                .add("Descrição Geral", "Compostos iônicos formados por cátions que liberam OH⁻ em solução.")
+                .add("Força", "Forte - possuem grau de dissociação praticamente 100%. São fortes: Bases de metais alcalinos e bases de metais alcalino-terrosos, com exceção de Be(OH)₂ e Mg(OH)₂ \nFraca - possuem grau de dissociação inferior a 5%."));
+            topicos.add(new Topico("Sais", "")
+                .add("Descrição Geral", "Compostos iônicos que apresentam, no mínimo, um cátion diferente de H+ e um ânion diferente de OH-.")
+                .add("Classificação por solubilidade", "Solúvel - Nitratos, Cloratos, Acetatos (Excluindo Acetato de Prata), Cloretos, Brometos, Iodetos e Sulfatos\nInsolúvel - Sulfetos, Carbonatos e Fosfatos"));
+            topicos.add(new Topico("Óxidos", "")
+                .add("Descrição Geral","São compostos binários (iônicos ou covalentes), que têm dois elementos. Possuem oxigênio na sua composição, sendo ele o seu elemento mais eletronegativo.")
+                .add("Classificação pelas ligações", "Iônicos - Combinação do oxigênio com metais.\nCovalentes - Combinação do oxigênio com elementos não metálicos."));
+            break;
+    }
+
+    return topicos;
+}
+
     // ── Conteúdo com tópicos expansíveis ─────────────────────
 
-    private JScrollPane buildContent() {
+    private JScrollPane buildContent(Fase fase) {
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setBackground(BG_PAINEL);
         content.setBorder(new EmptyBorder(10, 12, 12, 12));
 
-        for (Topico topico : TOPICOS) {
+        List<Topico> topicosDaFase = getTopicosPorFase(fase);
+
+        for (Topico topico : topicosDaFase) {
             content.add(buildTopicoPanel(topico));
             content.add(Box.createVerticalStrut(6));
         }
@@ -362,8 +365,8 @@ public class PainelAjuda extends JDialog {
 
     // ── Método estático para abrir o painel ───────────────────
 
-    public static void mostrar(JFrame owner) {
-        PainelAjuda painel = new PainelAjuda(owner);
+    public static void mostrar(JFrame owner, Fase fase) {
+        PainelAjuda painel = new PainelAjuda(owner, fase);
         painel.setVisible(true);
     }
 }
