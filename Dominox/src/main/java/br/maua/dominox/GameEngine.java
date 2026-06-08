@@ -2,6 +2,7 @@ package br.maua.dominox;
 import java.util.*;
 
 public class GameEngine {
+    private int points = 0;
     private String statusMessage;
     private Tabuleiro tabuleiro;
     private TurnoManager turnoManager;
@@ -78,24 +79,32 @@ public class GameEngine {
         if (!isHumanTurn()) return false;
         Player human = turnoManager.getPlayers().get(0);
 
+        // Lógica para jogada inicial (primeira peça da mesa)
         if (tabuleiro.isBoardEmpty()) {
             tabuleiro.placeDomino(d, true);
             human.removeDomino(d);
+            this.points += 2; // Acerto
             turnoManager.advanceTurn();
             return true;
         }
 
         String targetEnd = toLeft ? tabuleiro.getLeftEnd() : tabuleiro.getRightEnd();
+        
+        // Validação de erro
         if (!faseAtual.dominoEncaixa(d, targetEnd)) {
-            statusMessage = "Essa peça não encaixa nessa ponta!";
+            this.points -= 1; // Penalidade por erro
+            statusMessage = "Essa peça não encaixa!";
             return false;
         }
 
+        // Jogada válida
         tabuleiro.orientAndPlace(d, targetEnd, toLeft);
         human.removeDomino(d);
-        if (checkGameOver() == false){
+        this.points += 2; // Acerto
+        
+        if (!checkGameOver()){
             turnoManager.advanceTurn();
-        };
+        }
         return true;
     }
 
@@ -150,18 +159,19 @@ public class GameEngine {
     }
     // ---- Getters ----
 
-    public boolean isHumanTurn()       { return turnoManager.isHumanTurn(); }
-    public boolean isGameOver()        { return turnoManager.isGameOver(); }
-    public String getWinner()          { return turnoManager.getWinner(); }
-    public String getStatusMessage()   { return statusMessage; }
-    public List<Player> getPlayers()   { return turnoManager.getPlayers(); }
-    public Player getHumanPlayer()     { return turnoManager.getHumanPlayer(); }
-    public int getCurrentPlayerIndex() { return turnoManager.getCurrentPlayerIndex(); }
-    public String getCurrentPlayerName() { return turnoManager.getCurrentPlayerName(); }
-    public List<Domino> getBoard()  { return tabuleiro.getBoard();    }
-    public String getLeftEnd()      { return tabuleiro.getLeftEnd();  }
-    public String getRightEnd()     { return tabuleiro.getRightEnd(); }
-    public boolean isBoardEmpty()   { return tabuleiro.isBoardEmpty();}
+    public boolean isHumanTurn()        { return turnoManager.isHumanTurn();}
+    public boolean isGameOver()         { return turnoManager.isGameOver();}
+    public String getWinner()           { return turnoManager.getWinner();}
+    public String getStatusMessage()    { return statusMessage;}
+    public List<Player> getPlayers()    { return turnoManager.getPlayers();}
+    public Player getHumanPlayer()      { return turnoManager.getHumanPlayer();}
+    public int getCurrentPlayerIndex()  { return turnoManager.getCurrentPlayerIndex();}
+    public String getCurrentPlayerName(){ return turnoManager.getCurrentPlayerName();}
+    public List<Domino> getBoard()      { return tabuleiro.getBoard();}
+    public String getLeftEnd()          { return tabuleiro.getLeftEnd();}
+    public String getRightEnd()         { return tabuleiro.getRightEnd();}
+    public boolean isBoardEmpty()       { return tabuleiro.isBoardEmpty();}
+    public int getPoints()              { return points;}
     
     
     public void setStatusMessage(String msg) { statusMessage = msg; }
