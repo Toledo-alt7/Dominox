@@ -77,7 +77,7 @@ public class WindowPage {
         c.gridy = 0;
         root.add(titleLabel, c);
 
-        //áduio
+        //áudio
         JLabel audioLabel = new JLabel("Áudio");
         audioLabel.setFont(new Font("Arial", Font.BOLD, 14));
         c.gridy = 1;

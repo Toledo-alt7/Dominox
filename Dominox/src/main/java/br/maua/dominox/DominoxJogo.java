@@ -12,14 +12,14 @@ public class DominoxJogo extends JFrame {
 
     private static final Color RED       = new Color(190, 30, 30);
     private static final Color RED_DARK  = new Color(140, 18, 18);
+    private JLabel          lblErros;
+    private BufferedImage   bgImagem;
+    private GameEngine      engine;
+    private Domino          dominoSelecionado = null;
+    private Fase            faseAtual;
 
-    private BufferedImage bgImagem;
-    private GameEngine    engine;
-    private Domino        dominoSelecionado = null;
-    private Fase faseAtual;
-
-    private JPanel      painelTabuleiro;
-    private JScrollPane scrollTabuleiro;
+    private JPanel          painelTabuleiro;
+    private JScrollPane     scrollTabuleiro;
 
     private JPanel playerPecasPainel;
 
@@ -78,17 +78,21 @@ public class DominoxJogo extends JFrame {
     // Barra de CIma
 
     private JPanel construirBarraCima() {
-        JPanel bar = new JPanel(new BorderLayout());
-        bar.setOpaque(false);
-        bar.setBorder(new EmptyBorder(12, 16, 6, 16));
+    JPanel bar = new JPanel(new BorderLayout());
+    bar.setOpaque(false);
+    bar.setBorder(new EmptyBorder(12, 16, 6, 16));
 
-        JButton btnVoltar = fazerBtnCircular("<", 90);
-        btnVoltar.addActionListener(e -> newJogo());
+    JButton btnVoltar = fazerBtnCircular("<", 90);
+    btnVoltar.addActionListener(e -> newJogo());
 
-        JPanel esquerda = wrap(btnVoltar, FlowLayout.LEFT);
+    // Novo label de erros
+    lblErros = new JLabel("Pontos: 0");
+    lblErros.setForeground(Color.WHITE);
+    lblErros.setFont(new Font("SansSerif", Font.BOLD, 20));
 
-        bar.add(esquerda,   BorderLayout.WEST);
-        return bar;
+    bar.add(wrap(btnVoltar, FlowLayout.LEFT), BorderLayout.WEST);
+    bar.add(lblErros, BorderLayout.EAST); // Coloca no canto direito da barra
+    return bar;
     }
 
     // BOT ESQUERDA (Bot 1, vertical)
@@ -424,11 +428,27 @@ public class DominoxJogo extends JFrame {
 
     private void doPlay(boolean toLeft) {
         if (dominoSelecionado == null) { showMsg("Selecione uma peça primeiro!"); return; }
+        
         boolean ok = engine.humanPlay(dominoSelecionado, toLeft);
-        if (!ok) { showMsg(engine.getStatusMessage()); return; }
+        
+        // Atualiza o Label independente de ser acerto ou erro
+        lblErros.setText("Pontos: " + engine.getPoints());
+        
+        // Feedback visual opcional: mudar cor se a pontuação estiver negativa
+        if(engine.getPoints() < 0) lblErros.setForeground(Color.RED);
+        else lblErros.setForeground(Color.WHITE);
+
+        if (!ok) { 
+            showMsg(engine.getStatusMessage()); 
+            return; 
+        }
+        
         dominoSelecionado = null;
-        reiniciar(); checkJogoOver();
-        if (!engine.isGameOver()) scheduleBotTurns();
+        reiniciar(); 
+        checkJogoOver();
+        if (!engine.isGameOver() && !engine.isHumanTurn()) {
+            scheduleBotTurns();
+        }
     }
 
     private void doPass() {
