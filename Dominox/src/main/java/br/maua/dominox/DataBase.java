@@ -35,8 +35,6 @@ public class DataBase {
                 sp.messageLabel.setText("Erro: Sem conexão com o banco.");
                 return;
             }
-            
-            // Prepara a infraestrutura do banco antes de tentar inserir [cite: 69]
             setDB(conn); 
 
             // Cadastra no DB incluindo o tipo_usuario

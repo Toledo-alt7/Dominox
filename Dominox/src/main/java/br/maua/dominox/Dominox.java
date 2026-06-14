@@ -27,7 +27,8 @@ public class Dominox {
                 // Fecha a conexão após preparar o ambiente se desejar, 
                 // ou mantenha-a aberta se o ConnectionDB gerenciar isso.
                 conn.close(); 
-            } else {
+            } 
+            else {
                 JOptionPane.showMessageDialog(null, "Erro: Não foi possível conectar ao banco MySQL. Verifique o arquivo .env.");
                 System.exit(0);
             }

@@ -15,7 +15,7 @@ public class FaseRegistry {
         List<String[]> listaPecas = new ArrayList<>();
         Map<String, Set<String>> mapaConexoes = new HashMap<>();
 
-        // Usa a conexão centralizada do seu projeto
+        // Usa a conexão centralizada do projeto
         try (Connection conn = ConnectionDB.getConexao()) {
             if (conn == null) {
                 System.err.println("Erro: Sem conexão com o banco para buscar a fase.");

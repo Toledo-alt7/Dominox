@@ -14,17 +14,17 @@ public class ConnectionDB {
 
     public static Connection getConexao() {
     try {
-        // 1. Conecta ao servidor raiz (sem o nome do banco na URL)
-        String urlServidor = String.format("jdbc:mysql://%s:3306/?allowMultiQueries=true", HOST); // Essa parte do allow queries está aqui pq o modo que eu fiz o DataBase não é permitido pelo sql, essa é uma gambiarra para facilitar a nossa vida
+        //Conecta ao servidor raiz
+        String urlServidor = String.format("jdbc:mysql://%s:3306/?allowMultiQueries=true", HOST); // Essa parte do allow MultiQueries está aqui pq o modo que eu fiz o DataBase não é permitido pelo sql, essa é uma gambiarra para facilitar a nossa vida
         Connection conn = DriverManager.getConnection(urlServidor, DB_USER, DB_PASS);
 
-        // 2. Cria o banco se ele não existir
+        //Cria o banco se ele não existir
         Statement stmt = conn.createStatement();
         stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DB_NAME);
         stmt.close(); // Sempre feche o Statement
         conn.close(); // Fecha a conexão raiz
         
-        // Agora conecta especificamente ao banco já criado
+        //Agora conecta especificamente ao banco já criado
         String urlFinal = String.format("jdbc:mysql://%s:3306/%s?allowMultiQueries=true", HOST, DB_NAME);
         return DriverManager.getConnection(urlFinal, DB_USER, DB_PASS);
         
