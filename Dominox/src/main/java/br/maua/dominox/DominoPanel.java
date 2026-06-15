@@ -48,9 +48,6 @@ public class DominoPanel extends JPanel {
         if (selected) {
             g2.setColor(new Color(255, 215, 0));
             g2.setStroke(new BasicStroke(3f));
-        } else if (playable) {
-            g2.setColor(new Color(80, 220, 80));
-            g2.setStroke(new BasicStroke(2f));
         } else {
             g2.setColor(new Color(120, 80, 30));
             g2.setStroke(new BasicStroke(1.5f));
