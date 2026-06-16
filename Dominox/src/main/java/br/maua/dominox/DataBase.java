@@ -36,7 +36,7 @@ public class DataBase {
             setDB(conn); 
 
             // Cadastra no DB incluindo o tipo_usuario
-            String sql = "INSERT INTO usuario (email, senha, tipo_usuario, ativo, acertos, erros) VALUES (?, ?, ?, true)";
+            String sql = "INSERT INTO usuario (email, senha, tipo_usuario, ativo) VALUES (?, ?, ?, true)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, user);
                 stmt.setString(2, pass);
@@ -243,28 +243,37 @@ public class DataBase {
             }
         }
     }
-    public void registrarResultado(int idUsuario, int faseNumero, int pontuacao, int tempoSegundos, boolean concluida) {
+    public void registrarResultado(
+        int idUsuario,
+        int faseNumero,
+        int pontuacao,
+        int tempoSegundos,
+        int acertos,
+        int erros,
+        boolean concluida) {
 
-        String sql =
-            "INSERT INTO historico_fases " +
-            "(id_usuario, fase_numero, pontuacao, tempo_segundos, concluida) " +
-            "VALUES (?, ?, ?, ?, ?)";
+    String sql =
+        "INSERT INTO historico_fases " +
+        "(id_usuario, fase_numero, pontuacao, tempo_segundos, acertos, erros, concluida) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection conn = ConnectionDB.getConexao();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try(Connection conn = ConnectionDB.getConexao();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, idUsuario);
-            stmt.setInt(2, faseNumero);
-            stmt.setInt(3, pontuacao);
-            stmt.setInt(4, tempoSegundos);
-            stmt.setBoolean(5, concluida);
-            stmt.executeUpdate();
-            
-        }
-        catch(SQLException e){
-            e.printStackTrace();
-        }
+        stmt.setInt(1, idUsuario);
+        stmt.setInt(2, faseNumero);
+        stmt.setInt(3, pontuacao);
+        stmt.setInt(4, tempoSegundos);
+        stmt.setInt(5, acertos);
+        stmt.setInt(6, erros);
+        stmt.setBoolean(7, concluida);
+
+        stmt.executeUpdate();
     }
+    catch(SQLException e){
+        e.printStackTrace();
+    }
+}
     
 
     //Inserção de dados
