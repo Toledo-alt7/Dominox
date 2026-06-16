@@ -38,7 +38,7 @@ public class DataBase {
             setDB(conn); 
 
             // Cadastra no DB incluindo o tipo_usuario
-            String sql = "INSERT INTO usuario (email, senha, tipo_usuario, ativo) VALUES (?, ?, ?, true)";
+            String sql = "INSERT INTO usuario (email, senha, tipo_usuario, ativo, acertos, erros) VALUES (?, ?, ?, true)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, user);
                 stmt.setString(2, pass);
@@ -62,17 +62,35 @@ public class DataBase {
             }
         }
     }
+        public int buscarIdUsuario(String email) { /* Estou utilizando para gravar o usuário caso ele saia da fase antes de concluí-la.
+        Referência: DominoxJogo em salvarProgresso [linha: +/- 477]
+        */
+        String sql =
+            "SELECT id_usuario FROM usuario WHERE email = ?";
+
+        try(Connection conn = ConnectionDB.getConexao();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    return rs.getInt("id_usuario");
+                }
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 
     // Validação de login e roteamento
     public String realizarLogin(String email, String senha) {
         // Retorna o cargo ("ALUNO" ou "PROFESSOR") para a interface decidir qual tela abrir
         String tipoUsuario = null; 
         String sql = "SELECT tipo_usuario FROM usuario WHERE email = ? AND senha = ? AND ativo = true";
-
         try (Connection conn = ConnectionDB.getConexao()) {
             if (conn != null) {
                 setDB(conn); // Garante que o banco exista caso o usuário vá direto pro login
-                
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                     stmt.setString(1, email);
                     stmt.setString(2, senha);
@@ -88,10 +106,8 @@ public class DataBase {
             System.err.println("Erro ao validar login.");
             e.printStackTrace();
         }
-        
         return tipoUsuario; // Retornará null se as credenciais estiverem incorretas
     }
-
     // Estruturação do banco de dados (Schemas e Tabelas)
     public void setDB(Connection conn) throws SQLException {
         // Agrupamos tudo em um único Statement para ficar mais limpo
@@ -127,6 +143,28 @@ public class DataBase {
                     "termo_b VARCHAR(50) NOT NULL, " +
                     "PRIMARY KEY (fase_numero, termo_a, termo_b), " +
                     "FOREIGN KEY (fase_numero) REFERENCES fases(numero) ON DELETE CASCADE);");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS historico_fases (" +
+                    "id_tentativa INT AUTO_INCREMENT PRIMARY KEY," +
+                    "id_usuario INT,"+
+                    "fase_numero INT,"+
+
+                    "pontuacao INT,"+
+                    "tempo_segundos INT,"+
+
+                    "acertos INT DEFAULT 0,"+
+                    "erros INT DEFAULT 0,"+
+
+                    "dicas_usadas INT DEFAULT 0,"+
+
+                    "concluida BOOLEAN DEFAULT FALSE,"+
+
+                    "data_tentativa DATETIME DEFAULT CURRENT_TIMESTAMP,"+
+
+                    "FOREIGN KEY (id_usuario)"+
+                        "REFERENCES usuario(id_usuario),"+
+
+                    "FOREIGN KEY (fase_numero)"+
+                        "REFERENCES fases(numero));");
 
             // Injeção da query (Evita dados duplicados)
             try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS total FROM fases")) {
@@ -138,10 +176,31 @@ public class DataBase {
             }
         }
     }
+    public void registrarResultado(int idUsuario, int faseNumero, int pontuacao, int tempoSegundos, boolean concluida) {
+
+        String sql =
+            "INSERT INTO historico_fases " +
+            "(id_usuario, fase_numero, pontuacao, tempo_segundos, concluida) " +
+            "VALUES (?, ?, ?, ?, ?)";
+
+        try(Connection conn = ConnectionDB.getConexao();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idUsuario);
+            stmt.setInt(2, faseNumero);
+            stmt.setInt(3, pontuacao);
+            stmt.setInt(4, tempoSegundos);
+            stmt.setBoolean(5, concluida);
+            stmt.executeUpdate();
+            
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
 
     //Inserção de dados
     private void popularDadosDoJogo(Statement stmt) throws SQLException {
-        // Use os "Text Blocks" do Java (as três aspas) para colar o script gigante sem problemas de formatação [cite: 75]
         String querySQL = """
                     -- FASE 1
                     INSERT INTO fases (numero, nome) VALUES (1, 'Ácidos e Bases - 1');

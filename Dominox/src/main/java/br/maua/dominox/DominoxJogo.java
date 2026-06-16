@@ -17,23 +17,22 @@ public class DominoxJogo extends JFrame {
     private GameEngine      engine;
     private Domino          dominoSelecionado = null;
     private Fase            faseAtual;
-
     private JPanel          painelTabuleiro;
     private JScrollPane     scrollTabuleiro;
-
-    private JPanel playerPecasPainel;
-
-    private JLabel bot1Label, bot2Label, bot3Label;
-
-    private JButton btnEsquerdo, btnDireito, btnPassar;
+    private JPanel          playerPecasPainel;
+    private JLabel          bot1Label, bot2Label, bot3Label;
+    private JButton         btnEsquerdo, btnDireito, btnPassar;
+    private int             sec = 0;
+    private JLabel          lblContador;
 
     public DominoxJogo(Fase faseAtual) {
         this.faseAtual = faseAtual;
-        try { bgImagem = ImageIO.read(new File("src\\main\\java\\br\\maua\\dominox\\background.png")); }
+        try { bgImagem = ImageIO.read(new File("src\\main\\java\\br\\maua\\dominox\\Assets\\background.png")); }
         catch (Exception e) { bgImagem = null; }
         engine = new GameEngine(faseAtual);
         iniciarUI();
         reiniciar();
+        iniciarContador();
     }
 
     // ═══════════════════════════════ UI ═══════════════════════════════
@@ -73,28 +72,36 @@ public class DominoxJogo extends JFrame {
         setSize(1100, 700);
         setMinimumSize(new Dimension(900, 600));
         setLocationRelativeTo(null);
+        
     }
 
-    // Barra de CIma
+    // Barra de Cima
 
     private JPanel construirBarraCima() {
     JPanel bar = new JPanel(new BorderLayout());
-    bar.setOpaque(false);
-    bar.setBorder(new EmptyBorder(12, 16, 6, 16));
+        bar.setOpaque(false);
+        bar.setBorder(new EmptyBorder(12, 16, 6, 16));
 
-    JButton btnVoltar = fazerBtnCircular("<", 90);
-    btnVoltar.addActionListener(e -> newJogo());
+        JButton btnVoltar = fazerBtnCircular("<", 90);
+        btnVoltar.addActionListener(e -> sairDaPartida());
 
-    // Novo label de erros
-    lblErros = new JLabel("Pontos: 0");
-    lblErros.setForeground(Color.WHITE);
-    lblErros.setFont(new Font("SansSerif", Font.BOLD, 20));
+        // Label de erros / Pontos
+        lblErros = new JLabel("Pontos: 0");
+        lblErros.setForeground(Color.WHITE);
+        lblErros.setFont(new Font("SansSerif", Font.BOLD, 20));
 
-    bar.add(wrap(btnVoltar, FlowLayout.LEFT), BorderLayout.WEST);
-    bar.add(lblErros, BorderLayout.EAST); // Coloca no canto direito da barra
-    return bar;
+        // Timer (Usando a variável de instância já declarada na classe)
+        lblContador = new JLabel("Tempo: 00:00", SwingConstants.CENTER); // Centralizado
+        lblContador.setForeground(Color.WHITE); // Corrigido para aparecer no fundo escuro
+        lblContador.setFont(new Font("SansSerif", Font.BOLD, 20));
+
+        // Adicionando os componentes no painel 'bar'
+        bar.add(wrap(btnVoltar, FlowLayout.LEFT), BorderLayout.WEST);
+        bar.add(lblContador, BorderLayout.CENTER); // Contador no meio
+        bar.add(lblErros, BorderLayout.EAST);      // Pontos na direita
+        return bar;
     }
-
+    
     // BOT ESQUERDA (Bot 1, vertical)
 
     private JPanel construirBotEsquerda() {
@@ -335,7 +342,22 @@ public class DominoxJogo extends JFrame {
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.addActionListener(e -> PainelAjuda.mostrar(this, faseAtual));
+        btn.addActionListener(e -> {
+                if(engine.getPoints() < 3){
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Você precisa de pelo menos 3 pontos para usar uma dica!"
+                    );
+                    return;
+                }
+                engine.gastarPontos(3);
+
+                lblErros.setText(
+                    "Pontos: " + engine.getPoints()
+                );
+
+                PainelAjuda.mostrar(this, faseAtual);
+            });
         return btn;
     }
 
@@ -455,7 +477,8 @@ public class DominoxJogo extends JFrame {
         boolean ok = engine.humanPass();
         if (!ok) { showMsg(engine.getStatusMessage()); return; }
         dominoSelecionado = null;
-        reiniciar(); checkJogoOver();
+        reiniciar();
+        checkJogoOver();
         if (!engine.isGameOver()) scheduleBotTurns();
     }
 
@@ -475,9 +498,23 @@ public class DominoxJogo extends JFrame {
             engine.getWinner() + "\n\nDeseja jogar novamente?",
             "Fim de Jogo", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
         if (choice == JOptionPane.YES_OPTION) newJogo();
+        DataBase db = new DataBase();
+        String email = SessionManager.getSavedUser();
+        if(email != null){
+            int idUsuario = db.buscarIdUsuario(email);
+            db.registrarResultado(
+                    idUsuario,
+                    faseAtual.getNumeroFase(),
+                    engine.getPoints(),
+                    sec,
+                    true
+            );
+        }
     }
 
     private void newJogo() {
+        sec = 0;
+        lblContador.setText("Tempo: 00:00");
         engine.startNewJogo(); dominoSelecionado = null; reiniciar();
         if (!engine.isHumanTurn()) scheduleBotTurns();
     }
@@ -489,13 +526,46 @@ public class DominoxJogo extends JFrame {
     public Fase getFaseAtual() {
         return faseAtual;
     }
-    // ═══════════════════════════════ MAIN ═══════════════════════════════════
+    private void iniciarContador() {
+    Timer timer = new Timer(1000, e -> {
+        sec++;
+        int min = sec / 60;
+        int seg = sec % 60;
+        lblContador.setText(String.format("Tempo: %02d:%02d", min, seg));
+    });
+    timer.start();
+    }
+    
+    private void sairDaPartida() {
+        int opcao = JOptionPane.showConfirmDialog(
+                this,
+                "Tem certeza de que deseja sair?\nSua pontuação será salva como está mas seu progresso será perdido.",
+                "Confirmar saída",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+        if(opcao != JOptionPane.YES_OPTION){
+            return;
+        }
+        salvarProgresso();
+        dispose();
+        new WindowPage(); // ajuste para o nome real da sua tela
+    }
+    private void salvarProgresso() {
 
-//     public static void main(String[] args) {
-//         SwingUtilities.invokeLater(() -> {
-//             try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-//             catch (Exception ignored) {}
-//             new DominoxJogo().setVisible(true);
-//         });
-//     }
- }
+    String email = SessionManager.getSavedUser();
+
+    DataBase db = new DataBase();
+
+    int idUsuario = db.buscarIdUsuario(email);
+
+    db.registrarResultado(
+            idUsuario,
+            faseAtual.getNumeroFase(),
+            engine.getPoints(),
+            sec,
+            false
+    );
+}
+
+}
