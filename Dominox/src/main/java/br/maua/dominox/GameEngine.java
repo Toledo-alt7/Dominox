@@ -2,20 +2,36 @@ package br.maua.dominox;
 import java.util.*;
 
 public class GameEngine {
-    private int points = 0;
-    private String statusMessage;
-    private Tabuleiro tabuleiro;
+    private int          points = 0;
+    private int          acertos = 0;
+    private int          erros = 0;
+    private int          dicasUsadas = 0;
+    private String       statusMessage;
+    private Tabuleiro    tabuleiro;
     private TurnoManager turnoManager;
-    private Fase faseAtual;
+    private Fase         faseAtual;
+    
     
     public GameEngine(Fase fase) {
         this.faseAtual = fase;
         tabuleiro = new Tabuleiro(faseAtual);
         turnoManager = new TurnoManager(this);
         startNewJogo();
+        
     }
-
+    public void registrarDica() {
+        dicasUsadas++;
+    }
+    public void gastarPontos(int valor){
+        points -= valor;
+        registrarDica();
+    }
+    
     public void startNewJogo() {
+        points = 0;
+        acertos = 0;
+        erros = 0;
+        dicasUsadas = 0;
         tabuleiro.resetar();
         turnoManager.setGameOver(false);
         turnoManager.setWinner(null);
@@ -78,7 +94,6 @@ public class GameEngine {
     public boolean humanPlay(Domino d, boolean toLeft) {
         if (!isHumanTurn()) return false;
         Player human = turnoManager.getPlayers().get(0);
-
         // Lógica para jogada inicial (primeira peça da mesa)
         if (tabuleiro.isBoardEmpty()) {
             tabuleiro.placeDomino(d, true);
@@ -92,7 +107,8 @@ public class GameEngine {
         
         // Validação de erro
         if (!faseAtual.dominoEncaixa(d, targetEnd)) {
-            this.points -= 1; // Penalidade por erro
+            this.points -= 1;
+            erros++; // Penalidade por erro
             statusMessage = "Essa peça não encaixa!";
             return false;
         }
@@ -100,7 +116,8 @@ public class GameEngine {
         // Jogada válida
         tabuleiro.orientAndPlace(d, targetEnd, toLeft);
         human.removeDomino(d);
-        this.points += 2; // Acerto
+        this.points += 2;
+        acertos++; // Acerto
         
         if (!checkGameOver()){
             turnoManager.advanceTurn();
@@ -172,7 +189,9 @@ public class GameEngine {
     public String getRightEnd()         { return tabuleiro.getRightEnd();}
     public boolean isBoardEmpty()       { return tabuleiro.isBoardEmpty();}
     public int getPoints()              { return points;}
-    
-    
+    public int getAcertos()             {return acertos;}
+    public int getErros()               {return erros;}
+    public int getDicasUsadas()         {return dicasUsadas;}
     public void setStatusMessage(String msg) { statusMessage = msg; }
+    
 }
