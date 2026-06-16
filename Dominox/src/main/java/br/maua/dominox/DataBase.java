@@ -2,12 +2,10 @@ package br.maua.dominox;
 
 import java.awt.Color;
 import java.sql.*;
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/*
-TODO
-adicionar data
-*/
+import javax.swing.*;
 
 public class DataBase {
 
@@ -38,7 +36,7 @@ public class DataBase {
             setDB(conn); 
 
             // Cadastra no DB incluindo o tipo_usuario
-            String sql = "INSERT INTO usuario (email, senha, tipo_usuario, ativo, acertos, erros) VALUES (?, ?, ?, true)";
+            String sql = "INSERT INTO usuario (email, senha, tipo_usuario, ativo) VALUES (?, ?, ?, true)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, user);
                 stmt.setString(2, pass);
@@ -108,6 +106,75 @@ public class DataBase {
         }
         return tipoUsuario; // Retornará null se as credenciais estiverem incorretas
     }
+    public List<RelatorioAluno> getRelatorioProfessor() {
+        List<RelatorioAluno> lista = new ArrayList<>();
+        String sql = """
+                SELECT
+                    u.id_usuario,
+                    u.email,
+                    COUNT(h.id_tentativa) partidas, -- "COALESCE" retorna o primeiro valor não nulo de uma lista de expressões
+                    SUM(CASE WHEN h.concluida = true THEN 1 ELSE 0 END) concluidas,
+                    COALESCE(SUM(h.acertos),0) acertos,
+                    COALESCE(SUM(h.erros),0) erros,
+                    COALESCE(AVG(h.pontuacao),0) media_pontos,
+                    COALESCE(AVG(h.tempo_segundos),0) media_tempo
+                FROM usuario u
+                LEFT JOIN historico_fases h ON u.id_usuario = h.id_usuario
+                WHERE u.tipo_usuario = 'ALUNO'
+                GROUP BY u.id_usuario
+                ORDER BY u.email
+                """;
+
+        try(Connection conn = ConnectionDB.getConexao();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()) {
+
+            while(rs.next()) {
+                RelatorioAluno r = new RelatorioAluno();
+                r.setIdUsuario(rs.getInt("id_usuario"));
+                r.setEmail(rs.getString("email"));
+                r.setPartidas(rs.getInt("partidas"));
+                r.setConcluidas(rs.getInt("concluidas"));
+                r.setAcertos(rs.getInt("acertos"));
+                r.setErros(rs.getInt("erros"));
+                r.setMediaPontuacao(rs.getDouble("media_pontos"));
+                r.setMediaTempo(rs.getDouble("media_tempo"));
+                lista.add(r);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    // Método novo para buscar as fases detalhadas de um aluno específico
+    public List<Object[]> getHistoricoDetalhadoAluno(int idUsuario) {
+        List<Object[]> detalhes = new ArrayList<>();
+        String sql = "SELECT fase_numero, pontuacao, tempo_segundos, acertos, erros FROM historico_fases WHERE id_usuario = ? ORDER BY data_tentativa ASC";
+        
+        try (Connection conn = ConnectionDB.getConexao();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, idUsuario);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int fase = rs.getInt("fase_numero");
+                    int pontos = rs.getInt("pontuacao");
+                    int tempoSegs = rs.getInt("tempo_segundos");
+                    int acertos = rs.getInt("acertos");
+                    int erros = rs.getInt("erros"); // Que será mapeado para a coluna 'X' na UI
+                    
+                    // Formata o tempo no padrão MM:SS
+                    String tempoFormatado = String.format("%02d:%02d", tempoSegs / 60, tempoSegs % 60);
+                    
+                    detalhes.add(new Object[]{ fase, pontos, tempoFormatado, acertos, erros });
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return detalhes;
+    }
     // Estruturação do banco de dados (Schemas e Tabelas)
     public void setDB(Connection conn) throws SQLException {
         // Agrupamos tudo em um único Statement para ficar mais limpo
@@ -176,28 +243,38 @@ public class DataBase {
             }
         }
     }
-    public void registrarResultado(int idUsuario, int faseNumero, int pontuacao, int tempoSegundos, boolean concluida) {
+    public void registrarResultado(
+        int idUsuario,
+        int faseNumero,
+        int pontuacao,
+        int tempoSegundos,
+        int acertos,
+        int erros,
+        boolean concluida) {
 
-        String sql =
-            "INSERT INTO historico_fases " +
-            "(id_usuario, fase_numero, pontuacao, tempo_segundos, concluida) " +
-            "VALUES (?, ?, ?, ?, ?)";
+    String sql =
+        "INSERT INTO historico_fases " +
+        "(id_usuario, fase_numero, pontuacao, tempo_segundos, acertos, erros, concluida) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection conn = ConnectionDB.getConexao();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try(Connection conn = ConnectionDB.getConexao();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, idUsuario);
-            stmt.setInt(2, faseNumero);
-            stmt.setInt(3, pontuacao);
-            stmt.setInt(4, tempoSegundos);
-            stmt.setBoolean(5, concluida);
-            stmt.executeUpdate();
-            
-        }
-        catch(SQLException e){
-            e.printStackTrace();
-        }
+        stmt.setInt(1, idUsuario);
+        stmt.setInt(2, faseNumero);
+        stmt.setInt(3, pontuacao);
+        stmt.setInt(4, tempoSegundos);
+        stmt.setInt(5, acertos);
+        stmt.setInt(6, erros);
+        stmt.setBoolean(7, concluida);
+
+        stmt.executeUpdate();
     }
+    catch(SQLException e){
+        e.printStackTrace();
+    }
+}
+    
 
     //Inserção de dados
     private void popularDadosDoJogo(Statement stmt) throws SQLException {

@@ -507,6 +507,8 @@ public class DominoxJogo extends JFrame {
                     faseAtual.getNumeroFase(),
                     engine.getPoints(),
                     sec,
+                    engine.getAcertos(),
+                    engine.getErros(),
                     true
             );
         }
@@ -564,6 +566,8 @@ public class DominoxJogo extends JFrame {
             faseAtual.getNumeroFase(),
             engine.getPoints(),
             sec,
+            engine.getAcertos(),
+            engine.getErros(),
             false
     );
 }
