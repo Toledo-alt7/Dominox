@@ -15,7 +15,7 @@ public class ConnectionDB {
     public static Connection getConexao() {
     try {
         //Conecta ao servidor raiz
-        String urlServidor = String.format("jdbc:mysql://%s:3306/?allowMultiQueries=true", HOST); // Essa parte do allow MultiQueries está aqui pq o modo que eu fiz o DataBase não é permitido pelo sql, essa é uma gambiarra para facilitar a nossa vida
+        String urlServidor = String.format("jdbc:mysql://%s:3306/?allowMultiQueries=true", HOST); 
         Connection conn = DriverManager.getConnection(urlServidor, DB_USER, DB_PASS);
 
         //Cria o banco se ele não existir
