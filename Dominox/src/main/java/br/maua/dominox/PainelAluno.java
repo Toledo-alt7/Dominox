@@ -20,7 +20,7 @@ public class PainelAluno extends JDialog {
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         add(lblTitulo, BorderLayout.NORTH);
 
-        // Colunas com o exato formato requisitado ("X" repesentando os erros)
+        
         String[] colunas = {"Fase", "Pontos", "Tempo", "Acertos", "Erros"};
         DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
             @Override
