@@ -21,7 +21,7 @@ public class PainelAluno extends JDialog {
         add(lblTitulo, BorderLayout.NORTH);
 
         // Colunas com o exato formato requisitado ("X" repesentando os erros)
-        String[] colunas = {"Fase", "Pontos", "Tempo", "Acertos", "X"};
+        String[] colunas = {"Fase", "Pontos", "Tempo", "Acertos", "Erros"};
         DefaultTableModel modelo = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
