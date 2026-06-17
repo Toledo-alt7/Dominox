@@ -4,9 +4,7 @@ import java.util.prefs.Preferences;
 
 public class SessionManager {
 
-    private static final Preferences prefs =
-            Preferences.userRoot().node("sessão/dominox");
-
+    private static final Preferences prefs   = Preferences.userRoot().node("sessão/dominox");
     private static final String KEY_USER     = "usuário_salvo";
     private static final String KEY_REMEMBER = "manter_login";
 
