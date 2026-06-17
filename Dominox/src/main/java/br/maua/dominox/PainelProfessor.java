@@ -14,7 +14,7 @@ public class PainelProfessor extends JFrame {
     public PainelProfessor() {
         setTitle("Dominox - Painel do Professor");
         setSize(900, 500);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
